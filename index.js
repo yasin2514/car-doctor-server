@@ -59,13 +59,24 @@ async function run() {
 
         })
 
-        // services
+        // services  sort search
 
         app.get('/services', async (req, res) => {
-            const cursor = serviceCollection.find();
+            const sort = req.query.sort;
+            const search = req.query.search;
+            const query = { title: { $regex: search, $options: 'i' } };
+            const options = {
+                sort: {
+                    "price": sort === 'asc' ? 1 : -1
+                },
+            };
+            const cursor = serviceCollection.find(query, options);
             const result = await cursor.toArray();
             res.send(result);
         });
+
+
+
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
